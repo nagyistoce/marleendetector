@@ -1,0 +1,3 @@
+#summary An Image Gallery Manager with face detection and recognition, written in Python.
+
+= Marleen Detector =
