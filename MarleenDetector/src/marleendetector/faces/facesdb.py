@@ -13,10 +13,20 @@ class FacesDBManager:
         Manages the faces and person-face connections
     """
     def __init__(self):
-        self.persons = self.__readPersonsFromFile()
+        self.max_p_id = -1
         self.person_binding = {}
+        self.persons = self.__readPersonsFromFile()
         pass
     
+    def addPerson(self, personname):
+        """
+            personname the name of a person, string
+        """
+        next_id = self.max_p_id + 1
+        self.max_p_id = next_id
+        person = Person(next_id, personname.strip())
+        self.persons.append(person)
+        return person
 
     def __readPersonsFromFile(self):
         #print GALLERY_PERSONS
@@ -26,13 +36,31 @@ class FacesDBManager:
             print index, line.strip()
             person = Person(index, line.strip())
             persons.append(person)
+            if self.max_p_id < index:
+                self.max_p_id = index
 
         return persons
      
     def bindPersonAndImage(self, person, image_id):
         if person in self.person_binding:
             # key exists, add value to array
-            self.person_binding[image_id].append()
+            self.person_binding[person].append(image_id)
+        else:
+            self.person_binding[person] = [image_id]
+            
+            
+    def saveBindings(self):
+        f = open(GALLERY_PERSON_BINDINGS, 'wr')
+        for person in self.person_binding:
+            f.write(person.name)
+            f.write('\n')
+            for img in self.person_binding[person]:
+                f.write(img)
+                f.write(' ')
+            f.write('\n')
+            print person
+            print self.person_binding[person]
+        f.close()
         
 fdbManager = FacesDBManager()
 

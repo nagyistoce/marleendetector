@@ -1,5 +1,8 @@
 import sys
+import operator
+
 from PyQt4 import QtCore, QtGui
+
 from facestrainer import *
 from marleendetector.faces.facesdb import *
 
@@ -12,8 +15,8 @@ class StartQT4(QtGui.QMainWindow):
         
         self.fdbManager = FacesDBManager() # reads all person names from a file
            
-        personListModel = PersonListModel(self.fdbManager.persons, self)
-        self.ui.personListView.setModel(personListModel)
+        self.personListModel = PersonListModel(self.fdbManager.persons, self)
+        self.ui.personListView.setModel(self.personListModel)
         
         # the label will show the normalized face
         #self.ui.faceLabel.setScaledContents(True)
@@ -29,9 +32,10 @@ class StartQT4(QtGui.QMainWindow):
         # here we connect signals with our slots
         QtCore.QObject.connect(self.ui.nextButton, QtCore.SIGNAL("clicked()"), self.nextImage)
         QtCore.QObject.connect(self.ui.saveResultButton, QtCore.SIGNAL("clicked()"), self.saveResults)
-        QtCore.QObject.connect(self.ui.personListView, QtCore.SIGNAL("pressed(QModelindex)"), self.key_pressed)
-        QtCore.QObject.connect(self.ui.personListView, QtCore.SIGNAL("doubleClicked(QModelindex *)"), self.double_clicked)
-        QtCore.QObject.connect(self.ui.personListView, QtCore.SIGNAL("doubleClicked(QModelIndex)"), self.ui.nextButton.click)
+        QtCore.QObject.connect(self.ui.newPersonButton, QtCore.SIGNAL("clicked()"), self.newPerson)        
+        #QtCore.QObject.connect(self.ui.personListView, QtCore.SIGNAL("pressed(QModelindex)"), self.key_pressed)
+        #QtCore.QObject.connect(self.ui.personListView, QtCore.SIGNAL("doubleClicked(QModelindex *)"), self.double_clicked)
+        #QtCore.QObject.connect(self.ui.personListView, QtCore.SIGNAL("doubleClicked(QModelIndex)"), self.nextImage)
 
 
     def key_pressed(self):
@@ -47,8 +51,10 @@ class StartQT4(QtGui.QMainWindow):
             # an item was selected from the list
             for sel in selection:
                 #print sel.row()
-                print str(self.fdbManager.persons[sel.row()])
+                person = self.fdbManager.persons[sel.row()]
+                print str(person)
                 print self.current_image_id
+                self.fdbManager.bindPersonAndImage(person, self.current_image_id)
                 #print sel.column()
             self.loadNextImage()
         else:
@@ -66,26 +72,40 @@ class StartQT4(QtGui.QMainWindow):
         except StopIteration:
             print "No more faces..."
 
-            
+    def newPerson(self):
+        print "new person"
+        personname = str(self.ui.lineEdit.text())
+        new_person = self.fdbManager.addPerson(personname)
+        self.personListModel.addNewPerson(new_person)
+    
     def saveResults(self):
+        self.fdbManager.saveBindings()
         print "save"
 
 class PersonListModel(QtCore.QAbstractListModel): 
+
     def __init__(self, datain, parent=None, *args): 
         """ datain: a list where each item is a row
         """
         QtCore.QAbstractTableModel.__init__(self, parent, *args) 
         self.listdata = datain
+        self.listdata.sort(key=operator.attrgetter('name'))
  
     def rowCount(self, parent=QtCore.QModelIndex()): 
         return len(self.listdata) 
+ 
  
     def data(self, index, role): 
         if index.isValid() and role == QtCore.Qt.DisplayRole:
             value = str(self.listdata[index.row()].name)
             return QtCore.QVariant(value)
         else: 
-            return QtCore.QVariant()         
+            return QtCore.QVariant()
+        
+    def addNewPerson(self, person):
+        self.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+        self.listdata.sort(key=operator.attrgetter('name'))          
+        self.emit(QtCore.SIGNAL("layoutChanged()"))
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
