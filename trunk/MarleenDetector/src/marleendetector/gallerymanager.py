@@ -7,6 +7,7 @@ GALLERY_CROPPED = GALLERY_LOCATION + "\\cropped"
 GALLERY_NORM = GALLERY_LOCATION + "\\norm"
 
 GALLERY_PERSONS = GALLERY_LOCATION + "\\persons.txt"
+GALLERY_PERSON_BINDINGS = GALLERY_LOCATION + "\\person_bindings.txt"
 
 
 CROPFACE_FILENAME_PATTERN = '\d\d\d\d_cropface_\d\d\d\d[.]jpg$'
