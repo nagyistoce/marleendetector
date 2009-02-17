@@ -53,9 +53,17 @@ class FaceNormalizer:
         for index, fname in enumerate(cropped_files):
             image_location = self.cropped_faces_dir + "\\" + fname
             image = cvLoadImage(image_location, 1) # a cropped non-normalized image
-          
+    
+            p = re.compile(CROPFACE_FILENAME_PATTERN)
+            m = p.match(fname)
+            prefix = m.group("prefix")
+            image_index = m.group("image_index")
+            face_index = m.group("face_index")
+            
             norm_image = self.__normImage(image, max_size) # normalize the image
-            location = self.norm_dir + "\\" + NORM_FILENAME % (index, )
+
+            norm_filename = prefix + "_" + image_index + "_norm_" + face_index + ".jpg"
+            location = self.norm_dir + "\\" + norm_filename
             cvSaveImage(location, norm_image) # save the image to file
 
     def __normImage(self, img, length):

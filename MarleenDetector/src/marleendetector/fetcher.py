@@ -5,18 +5,21 @@ import os
 
 from marleendetector.gallerymanager import *
 
-SAVED_IMAGE_PATTERN = "savedimage_%04d.jpg"
+SAVED_IMAGE_PATTERN = "_%04d.jpg"
+
 class ImageFetcher:
-    def __init__(self, address, start_number, end_number, output_format=SAVED_IMAGE_PATTERN, output_dir=GALLERY_LIBRARY):
+    def __init__(self, address, prefix, start_number, end_number, output_format=SAVED_IMAGE_PATTERN, output_dir=GALLERY_LIBRARY):
         """
             address should be a %-format string
+            prefix is used to distinguish between different image sources or events
             start_number is the number the sequence will begin with
             end_number is the last number of the sequence (inclusive)
         """
         self.address = address
+        self.prefix = prefix
         self.start_number = start_number
         self.end_number = end_number + 1
-        self.output_format = output_format
+        self.output_format = self.prefix + output_format
         if output_dir is None:
             # output dir is not set, use the current dir
             self.output_dir = os.path.dirname(os.path.abspath(__file__))
