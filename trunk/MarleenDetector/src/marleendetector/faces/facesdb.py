@@ -61,7 +61,29 @@ class FacesDBManager:
             print person
             print self.person_binding[person]
         f.close()
-        
-fdbManager = FacesDBManager()
+
+
+class FaceBindingsManager:
+    def __init__(self):
+        pass
+    
+    def readBindings(self, filename):
+        bindings = {}
+        f = open(filename, 'r')
+        currentname = None
+        for index, line in enumerate(f):
+            if index % 2 == 0:
+                # name line
+                name = line.strip()
+                currentname = name
+            else:
+                # normalized images of this person
+                image_names = line.strip()
+                bindings[currentname] = image_names.split()
+        f.close()
+        return bindings
+    
+if __name__ == "main":
+    fdbManager = FacesDBManager()
 
 #print man.readPersonsFromFile()

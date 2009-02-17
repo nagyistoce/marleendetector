@@ -23,7 +23,7 @@ haarconfig["profileface"] =     h_basedir+"\\haarcascade_profileface.xml"
 
 class FaceDetectorManager:
 
-    def __init__(self, image_location, name, output_dir=GALLERY_LOCATION+"\\cropped"):
+    def __init__(self, image_location, name, output_dir=GALLERY_CROPPED):
         self.name = name # a readable name for the current image
         self.detect = Detector() # init the face detector
         self.detect.input_name = image_location # the file with faces
