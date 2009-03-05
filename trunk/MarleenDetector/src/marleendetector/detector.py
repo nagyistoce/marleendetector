@@ -2,6 +2,8 @@ import sys
 from opencv.cv import *
 from opencv.highgui import *
 
+from marleendetector.exceptions import *
+
 colour = {}
 colour["red"] = CV_RGB(255,0,0)
 colour["green"] = CV_RGB(0,255,0)
@@ -180,6 +182,9 @@ class Detector:
         #image = cvLoadImage(self.input_name, 1);
         #self.org_image = image
         self.org_image = cvLoadImage(self.input_name, 1)
+        if self.org_image is None:
+            # file could not be opened
+            raise FileNotFoundError(self.input_name)
         #self.output_image = self.org_image
         self.output_image = cvLoadImage(self.input_name, 1)
         print "width: " + str(self.org_image.width)

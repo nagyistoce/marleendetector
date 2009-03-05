@@ -7,7 +7,10 @@ from opencv.highgui import *
 
 from marleendetector.gallerymanager import *
 
+
+
 NORM_FILENAME = "norm_%04d.jpg"
+DEFAULT_FACE_SIZE = 400
 
 
 class FaceNormalizer:
@@ -46,8 +49,12 @@ class FaceNormalizer:
                 max_width = image.width
         return max_width
     
-    def normalizeFaces(self):
-        max_size = self.__findMaxSize()
+    def normalizeFaces(self, useDefaultSize=True):
+        max_size = DEFAULT_FACE_SIZE
+        if useDefaultSize == False:
+            # use the maximum face size found
+            max_size = self.__findMaxSize()
+            
         # loop over the original images
         cropped_files = self.getCroppedFaceImages()
         for index, fname in enumerate(cropped_files):
@@ -84,5 +91,41 @@ class FaceNormalizer:
         return norm_image
             
 
+class ImageResizer:
     
+    def __init__(self):
+        pass
+    
+    def resizeImages(self, image_locations, size):
+        """
+            resizes the images to a rectangle with the given size
+        """
+        for image_location in image_locations:
+            # resize this image
+            pass
+        
+    def resizeImage(self, image_location, ouput_location, size):
+        """
+            resizes the image to a rectangle with the given size and saves it
+        """
+        width = size
+        height = size
+        
+        input_image = cvLoadImage(image_location, 1) # flag: >0 the loaded image is forced to be a 3-channel color image
+        
+        output_image = cvCreateImage(cvSize(cvRound(width), cvRound(height)), 8, 3);
+        cvResize(input_image, output_image, CV_INTER_LINEAR);
+        cvSaveImage(ouput_location, output_image) # save the image to file
+        
+if __name__ == "__main__":
+    print "run main"
+    resizer = ImageResizer()
+    size = 200
+    image_location = GALLERY_LOCATION + "\\test\\sample_dennis\\ZAS1_0000_norm_0000.jpg"
+    crop = GALLERY_CROPPED
+    print crop
+    print image_location
+    ouput_location = GALLERY_LOCATION + "\\test\\sample_dennis\\ZAS1_0000_norm_0000.jpg"
+    resizer.resizeImage(image_location, ouput_location, size)
+    print isCropfaceFilename(ouput_location)
     
