@@ -56,16 +56,24 @@ class ImageFetcher:
         for index, image_url in enumerate(image_list):
             print "Fetch " + image_url
             opener1 = urllib2.build_opener()
-            page1 = opener1.open(image_url)
-            my_picture = page1.read()
-            #filename = self.output_dir + "saved_image_" + str(index) + image_url[-4:]
-            filename = self.output_format % (index,)
-            filepath = os.path.join(self.output_dir, filename)
-            print filepath
-            output_images.append(filepath)   
-            fout = open(filepath, "wb")
-            fout.write(my_picture)
-            fout.close()
+            page1 = None
+            try:
+                page1 = opener1.open(image_url)
+                my_picture = page1.read()
+                filename = self.output_format % (index,)
+                filepath = os.path.join(self.output_dir, filename)
+                print filepath
+                output_images.append(filepath)   
+                fout = open(filepath, "wb")
+                fout.write(my_picture)
+                fout.close()
+            except urllib2.HTTPError, inst:
+                print "HTTP Error occured at URL: " + image_url
+                print inst
+            except urllib2.URLError, inst:
+                print "URL Error occured at URL: " + image_url
+                print inst
+                
         return output_images     
 
 if __name__ == '__main__':

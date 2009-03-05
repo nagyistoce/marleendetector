@@ -1,11 +1,15 @@
 import os
 import re
 import shutil
+from marleendetector.image_util import *
+#from marleendetector.normalizer import *
 
 GALLERY_LOCATION = "C:\\Documents and Settings\\rlindeman\\My Documents\\TU\\PTG\\workspace\\MarleenDetector\\gallery"
 GALLERY_LIBRARY = GALLERY_LOCATION + "\\library"
 GALLERY_CROPPED = GALLERY_LOCATION + "\\cropped"
 GALLERY_NORM = GALLERY_LOCATION + "\\norm"
+
+GALLERY_EYES = GALLERY_LOCATION + "\\eyes"
 
 GALLERY_PERSONS = GALLERY_LOCATION + "\\persons.txt"
 GALLERY_PERSON_BINDINGS = GALLERY_LOCATION + "\\person_bindings.txt"
@@ -22,14 +26,17 @@ class GalleryManager:
     def __init__(self):
         pass
     
-    def getImages(self, person_id):
+    def getPersonImages(self, person_name):
         """
             person_id is a string
             Returns a list of images of the specified person
         """
-        pass
+        person_dir = GALLERY_LOCATION + "\\" + person_name
+        dirList = os.listdir(person_dir) # all files in the dir
+        return map(lambda x: person_dir + "\\" + x, dirList)
+
     
-    def sortBindings(self, bindings):
+    def moveFacesToPersonDir(self, bindings):
         """
             Copies the faces to GALLERY_LOCATION\$person_name
         """
@@ -59,6 +66,29 @@ class GalleryManager:
         dst = path_name + "\\" + image_filename
         shutil.copyfile(src, dst)
         return True
+    
+    
+    def checkPersonImageSizes(self, person_name, image_size):
+        """
+            returns true if all the images have the same size as image_size
+        """
+        images_list = self.getPersonImages(person_name)
+        incorrectImages = []
+        for image_location in images_list:
+            dimension = getDimension(image_location)
+            width, height = dimension
+            if width == image_size and height == image_size:
+                # image has the correct size
+                pass
+            else:
+                incorrectImages.append(image_location)
+        return incorrectImages
+
+    def emptyDir(self, person_name):
+        """
+            Removes all the images in the person's dir
+        """
+        dir = GALLERY_LOCATION + "\\" + person_name
     
 
 def isNormfaceFilename(filename):
@@ -93,8 +123,12 @@ def getNormFaceImages(norm_faces_dir=GALLERY_NORM):
     norm_names = filter(isNormfaceFilename, dirList) # only keep image files
     return norm_names
 
-if __name__ == "main":
+if __name__ == "__main__":
     g =  getCroppedFaceImages().__iter__()
     print g.next()
     print getCroppedFaceImages()
     print getNormFaceImages()
+    galleryManager =  GalleryManager()
+    print galleryManager.getPersonImages("dennis")
+    print galleryManager.checkPersonImageSizes("dennis", 400)
+    print GALLERY_CROPPED
