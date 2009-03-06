@@ -10,3 +10,7 @@ This project was originally started because of a narcissistic friend of mine (Ma
 The MarleenDetector uses several python libraries
  * PyCV, a Python library of OpenCV: http://www3.ntu.edu.sg/home5/pham0004/pycv/
  * PyQt4, a GUI Toolkit for Python: http://www.riverbankcomputing.co.uk/software/pyqt/intro
+
+= Modules =
+ * GalleryManager
+ * FaceDetection and FaceRecognition
