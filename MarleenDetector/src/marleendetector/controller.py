@@ -1,3 +1,8 @@
+# Controller
+# main-method:
+# 1. Download a sequence of pictures from the web
+# 2. Detect faces in these images
+# 3. Normalize the face-images
 import logging
 
 from marleendetector.fetcher import *
@@ -7,9 +12,16 @@ from marleendetector.normalizer import *
 
 class Controller:
     
-    def __init__(self):
-        #
-        pass
+    def __init__(self, downloadImages=False):
+        """
+            Initializes the Controller. The Controller downloads images, detects faces,
+            saves the faces to file and normalizes the images
+            
+            @param downloadImages: if downloadImages is True the images will be (re)downloaded from the web,
+                                   if False the images are presumed to be already saved on disk in the library dir
+        """
+        self.downloadImages = downloadImages
+        self.gallerymanager = GalleryManager()
     
     # fetch images
     def __fetchImages(self, address, prefix, start, end, fetch=True):
@@ -30,30 +42,40 @@ class Controller:
         """
         #address = "http://zellamsee.boereburg.nl/ZellamSee2008stapcamerafotos/stamcamera_0001.jpg"
         #address = "http://zellamsee.boereburg.nl/ZellamSee2008stapcamerafotos/stamcamera_%04d.jpg"
-        fetcher = ImageFetcher(address, prefix, start, end)
+        fetcher = ImageFetcher(address, prefix, start, end, output_dir=self.gallerymanager.getLibrary(prefix))
         if fetch:
-            image_list = fetcher.fetchImages()
+            image_list = fetcher.fetchImages() # redownload the images
         else:
-            image_list = fetcher.getOutputImages()
+            image_list = fetcher.getOutputImages() # generate the filename list
         return image_list
     
     def __extractFaces(self, image_location, id):
+        """
+            Detect faces in the image and save them separately
+        """
         try:
             man = FaceDetectorManager(image_location, id)
             man.startDetection()
             #man.getFaces()
             calc_super_face=False # return all the face boxes (faces will be detected multiple times with different classifiers)
             man.getFaces(super_faces=calc_super_face) 
-            man.saveFacesToFile(super_faces=calc_super_face)
+            faces_data = man.saveFacesToFile(super_faces=calc_super_face)
+            # faces_data = [face_data, face_data, ...]
+            # face_data = (org_image_id, face_image_id, face_rectangle)
             #man.showResult()
         except:
             print "Exception while detecting images! Skipping image..."
     
     def main(self, fetchData):
+        """
+            1. Download a sequence of pictures from the web and returns a list with image file_locations
+            2. Detect faces in these images
+            3. Normalize the face-images
+        """
         address, start, end, prefix = fetchData
         print "Fetching images..."
         #downloadImages = True # download all the images
-        downloadImages = False # only use this when the images are already downloaded
+        downloadImages = self.downloadImages # only use this when the images are already downloaded
         image_list = self.__fetchImages(address, prefix, start, end, fetch=downloadImages) # saves the images in GALLERY_LIBRARY
         print "Done fetching images..."
         
@@ -72,12 +94,13 @@ class Controller:
 if __name__ == "__main__":
     # run main program
     controller = Controller()
+    #controller.downloadImages = True # download the images
     # %-formatted url, only one format variable is allowed
     address = "http://www.boereburg.nl/BZBALLEREMMENLOS/bzb23012009_%03d.jpg"
     #address = "http://zellamsee.boereburg.nl/ZellamSee2008stapcamerafotos/stamcamera_%04d.jpg"
     
     start = 0 # images-url range should start with this number
-    end = 20 # last number of the images-url range
+    end = 2 # last number of the images-url range
     prefix = "BARL" # unique prefix for this photo-set
     fetchData = (address, start, end, prefix)
     controller.main(fetchData)

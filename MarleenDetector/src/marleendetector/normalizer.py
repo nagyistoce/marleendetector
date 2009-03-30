@@ -14,8 +14,16 @@ DEFAULT_FACE_SIZE = 400
 
 
 class FaceNormalizer:
+    """
+        The FaceNormalizer normalizes the cropped_face_images to a standard size and gray-scale
+    """
     
     def __init__(self, cropped_faces_dir=GALLERY_CROPPED, norm_dir=GALLERY_NORM):
+        """
+        Initializes the FaceNormalizer, 
+        set cropped_faces_dir to link to the directory containing all the cropped faces
+        set norm_dir to the directory where the normalized images should be saved
+        """
         self.cropped_faces_dir = cropped_faces_dir # non normalized faces location
         self.norm_dir = norm_dir # normalized faces dir
         pass
@@ -50,6 +58,9 @@ class FaceNormalizer:
         return max_width
     
     def normalizeFaces(self, useDefaultSize=True):
+        """
+            Normalizes all the images in the cropped_faces_dir
+        """
         max_size = DEFAULT_FACE_SIZE
         if useDefaultSize == False:
             # use the maximum face size found
@@ -57,6 +68,9 @@ class FaceNormalizer:
             
         # loop over the original images
         cropped_files = self.getCroppedFaceImages()
+        filecount = len(cropped_files)
+        last_percentage = 0
+        print "Normalizing " + str(filecount) + " images"
         for index, fname in enumerate(cropped_files):
             image_location = self.cropped_faces_dir + "\\" + fname
             image = cvLoadImage(image_location, 1) # a cropped non-normalized image
@@ -72,6 +86,12 @@ class FaceNormalizer:
             norm_filename = prefix + "_" + image_index + "_norm_" + face_index + ".jpg"
             location = self.norm_dir + "\\" + norm_filename
             cvSaveImage(location, norm_image) # save the image to file
+            # print some statistics
+            if (index % 10 == 0):
+                percentage =  (index*100/filecount)
+                if (percentage > last_percentage):
+                    print "Percentage Done: " + str(percentage)
+            
 
     def __normImage(self, img, length):
         print "Generating norm image..."

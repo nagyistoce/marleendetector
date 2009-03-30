@@ -24,6 +24,12 @@ haarconfig["profileface"] =     h_basedir+"\\haarcascade_profileface.xml"
 class FaceDetectorManager:
 
     def __init__(self, image_location, name, output_dir=GALLERY_CROPPED):
+        """
+            Initializes the FaceDetectorManager, loads the Detector, loads (and formats) the image
+            @param image_location: the full path to the image file
+            @param name: a readable name for the image
+            @param output_dir: path to the dirctory where the extracted faces will be saved  
+        """
         self.name = name # a readable name for the current image
         self.detect = Detector() # init the face detector
         self.detect.input_name = image_location # the file with faces
@@ -35,6 +41,11 @@ class FaceDetectorManager:
         self.outputdir = output_dir
     
     def startDetection(self):
+        """
+            Loop over all haar classifiers specified and use them to detect faces.
+            The face rectangles are saved in the list self.rectangle_list
+            It is highly probable that the same face will be found multiple times by different classifiers
+        """
         # loop over all haar config's
         for index, haar_key in enumerate(haarconfig):
             haar_location = haarconfig[haar_key]
@@ -52,13 +63,14 @@ class FaceDetectorManager:
                     pt2 = cvPoint( int((face_rect.x+face_rect.width)*scale),
                                    int((face_rect.y+face_rect.height)*scale) )
                     rect = (pt1, pt2)
-                    self.rectangle_list.append(rect)
+                    self.rectangle_list.append(rect) # append the face rectangle to the list
                     face_count = face_count + 1
                     
             print "faces found: " + str(face_count)
             self.detect.draw(faces, colourindex=index) # draw rectangles around the faces
             #detect.showImage()
         print "FACE DETECTION DONE"
+        
 #detect.showImage()
 #print rectangle_list
     def getFaces(self, super_faces=True):
@@ -96,6 +108,7 @@ class FaceDetectorManager:
         else:
             faces = self.rectangle_list
             
+        face_list = []
         for index, face in enumerate(faces):
             #filename = image_basedir + "\\crop_face"+ str(index) +".jpg"
             #filename = "faces\\%s_cropface_%04d.jpg" % (self.name, index)
@@ -103,6 +116,12 @@ class FaceDetectorManager:
             filepath = self.outputdir + "\\" + filename 
             print filepath
             self.detect.cropRectangle(face, filepath)
+            org_image_id = self.name # the name of the current picture: {prefix}_{index}
+            face_image_id = index # face index id
+            face_rectangle = face # the coordinates of the face
+            face_data = (org_image_id, face_image_id, face_rectangle)
+            face_list.append(face_data)
+        return face_list
 
     def showResult(self):
         self.detect.showImage() 
