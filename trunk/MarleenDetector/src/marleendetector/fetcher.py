@@ -25,7 +25,7 @@ class ImageFetcher:
             self.output_dir = os.path.dirname(os.path.abspath(__file__))
         else:
             self.output_dir = output_dir
-    #http://zellamsee.boereburg.nl/ZellamSee2008stapcamerafotos/stamcamera_0000.jpg
+
     
     def __generateImageList(self):
         """
@@ -36,6 +36,9 @@ class ImageFetcher:
         return list
     
     def getOutputImages(self):
+        """
+            Generate a list with file locations
+        """
         output_images = []
         seq = range(self.start_number, self.end_number)
         list = map(lambda x: self.output_format % (x, ), seq)
@@ -60,7 +63,7 @@ class ImageFetcher:
             try:
                 page1 = opener1.open(image_url)
                 my_picture = page1.read()
-                filename = self.output_format % (index,)
+                filename = self.output_format % (index,) # insert the current index into the image file name
                 filepath = os.path.join(self.output_dir, filename)
                 print filepath
                 output_images.append(filepath)   
@@ -79,12 +82,13 @@ class ImageFetcher:
 if __name__ == '__main__':
     #address = "http://zellamsee.boereburg.nl/ZellamSee2008stapcamerafotos/stamcamera_0001.jpg"
     address = "http://zellamsee.boereburg.nl/ZellamSee2008stapcamerafotos/stamcamera_%04d.jpg"
+    prefix = "ZAS1"
     output_format = "savedimage_%04d.jpg"
     start = 0
     end = 124
     output_dir = None
     output_dir = "C:\\Documents and Settings\\rlindeman\\My Documents\\TU\\PTG\\workspace\\MarleenDetector\\gallery\\library"
-    fetcher = ImageFetcher(address, start, end, output_format, output_dir=output_dir)
+    fetcher = ImageFetcher(address, prefix, start, end, output_format, output_dir=output_dir)
     image_list = fetcher.fetchImages()
 
 

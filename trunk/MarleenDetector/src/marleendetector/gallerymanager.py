@@ -17,6 +17,15 @@ GALLERY_PERSON_BINDINGS = GALLERY_LOCATION + "\\person_bindings.txt"
 CROPFACE_FILENAME_PATTERN = '(?P<prefix>[a-zA-Z0-9]+)_(?P<image_index>[a-zA-Z0-9]+)_cropface_(?P<face_index>[a-zA-Z0-9]+)[.]jpg$'
 NORMFACE_FILENAME_PATTERN = '(?P<prefix>[a-zA-Z0-9]+)_(?P<image_index>[a-zA-Z0-9]+)_norm_(?P<face_index>[a-zA-Z0-9]+)[.]jpg$'
 
+class LibraryInfo:
+    def __init__(self, library_id, description):
+        self.library_id = library_id
+        self.description = description
+        
+    def __str__(self):
+        short_description = description[0:200]
+        return "<Library library_id:%s, descr:%s>" % (self.library_id, short_description)
+
 class GalleryManager:
     """
     Gallery Manager handles loading and saving of the images in the gallery.
@@ -35,6 +44,11 @@ class GalleryManager:
         dirList = os.listdir(person_dir) # all files in the dir
         return map(lambda x: person_dir + "\\" + x, dirList)
 
+    def getLibrary(self, prefix):
+        """
+            returns the folder name of the library with the specified prefix
+        """
+        return GALLERY_LIBRARY + "\\" + prefix
     
     def moveFacesToPersonDir(self, bindings):
         """
@@ -130,5 +144,7 @@ if __name__ == "__main__":
     print getNormFaceImages()
     galleryManager =  GalleryManager()
     print galleryManager.getPersonImages("dennis")
-    print galleryManager.checkPersonImageSizes("dennis", 400)
+    print "checkPersonImageSizes"
+    print len(galleryManager.checkPersonImageSizes("cropped", 400))
+    print "CROP dir"
     print GALLERY_CROPPED
