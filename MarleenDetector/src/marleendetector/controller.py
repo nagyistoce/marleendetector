@@ -63,6 +63,7 @@ class Controller:
             # faces_data = [face_data, face_data, ...]
             # face_data = (org_image_id, face_image_id, face_rectangle)
             #man.showResult()
+            return faces_data
         except:
             print "Exception while detecting images! Skipping image..."
     
@@ -79,13 +80,21 @@ class Controller:
         image_list = self.__fetchImages(address, prefix, start, end, fetch=downloadImages) # saves the images in GALLERY_LIBRARY
         print "Done fetching images..."
         
+        all_face_data = []
         print "Extracting faces..." # saves the faces in GALLERY_CROPPED
         for index, image_location in enumerate(image_list):
             id = "%04d" % (index, )
             print image_location
-            self.__extractFaces(image_location, prefix + "_" + id)
+            faces_data = self.__extractFaces(image_location, prefix + "_" + id)
+            # faces_data = [face_data, face_data, ...]
+            # face_data = (org_image_id, face_image_id, face_rectangle)       
+            all_face_data.extend(faces_data)     
         print "Done extracting faces..."
-        
+        print all_face_data
+        for (org_image_id, face_image_id, face_rectangle) in all_face_data:
+            (ul, dr) = face_rectangle
+            print ul.x
+        return
         print "Normalizing faces..." # save normalized faces in GALLERY_NORM
         normalizer = FaceNormalizer()
         normalizer.normalizeFaces()

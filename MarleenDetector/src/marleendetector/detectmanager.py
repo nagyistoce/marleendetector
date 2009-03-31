@@ -22,6 +22,10 @@ haarconfig["profileface"] =     h_basedir+"\\haarcascade_profileface.xml"
 
 
 class FaceDetectorManager:
+    """
+        This classes manages the various face detectors.
+        Provide it with an image and it will use all its haarclassifiers to detect faces. 
+    """
 
     def __init__(self, image_location, name, output_dir=GALLERY_CROPPED):
         """
