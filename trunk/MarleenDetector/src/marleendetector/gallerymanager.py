@@ -9,6 +9,8 @@ GALLERY_LIBRARY = GALLERY_LOCATION + "\\library"
 GALLERY_CROPPED = GALLERY_LOCATION + "\\cropped"
 GALLERY_NORM = GALLERY_LOCATION + "\\norm"
 
+GALLERY_DATABASE = GALLERY_LOCATION + "\\database" # the dir where the database is stored
+
 GALLERY_EYES = GALLERY_LOCATION + "\\eyes"
 
 GALLERY_PERSONS = GALLERY_LOCATION + "\\persons.txt"

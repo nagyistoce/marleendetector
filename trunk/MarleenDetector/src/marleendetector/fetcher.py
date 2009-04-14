@@ -54,7 +54,7 @@ class ImageFetcher:
         print "Fetching..."
         image_list = self.__generateImageList()
         output_images = []
-        
+        db = FaceOriginsDB()
         # filename = "fetch" + str(index) + ".txt"
         for index, image_url in enumerate(image_list):
             print "Fetch " + image_url
@@ -66,6 +66,7 @@ class ImageFetcher:
                 filename = self.output_format % (index,) # insert the current index into the image file name
                 filepath = os.path.join(self.output_dir, filename)
                 print filepath
+                db.addImageOrigin(image_url, filename, filepath)
                 output_images.append(filepath)   
                 fout = open(filepath, "wb")
                 fout.write(my_picture)
@@ -76,7 +77,7 @@ class ImageFetcher:
             except urllib2.URLError, inst:
                 print "URL Error occured at URL: " + image_url
                 print inst
-                
+        db.close()        
         return output_images     
 
 if __name__ == '__main__':

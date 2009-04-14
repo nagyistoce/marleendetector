@@ -76,6 +76,9 @@ class Detector:
         cvRectangle( img, pt1, pt2, CV_RGB(255,50,100), 0, 8, 0 );
 
     def cropRectangle(self, rectangle, location):
+        """
+            Cuts an image of size rectangle from the original image and saves it
+        """
         image = self.org_image
         pt1 = rectangle[0]
         pt2 = rectangle[1]

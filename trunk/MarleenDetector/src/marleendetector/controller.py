@@ -9,6 +9,7 @@ from marleendetector.fetcher import *
 from marleendetector.detectmanager import *
 from marleendetector.gallerymanager import *
 from marleendetector.normalizer import *
+from marleendetector.faces.faceorigins import *
 
 class Controller:
     
@@ -22,6 +23,8 @@ class Controller:
         """
         self.downloadImages = downloadImages
         self.gallerymanager = GalleryManager()
+        self.facedataDB = FaceOriginsDB()
+        print "Done creating"
     
     # fetch images
     def __fetchImages(self, address, prefix, start, end, fetch=True):
@@ -64,7 +67,10 @@ class Controller:
             # face_data = (org_image_id, face_image_id, face_rectangle)
             #man.showResult()
             return faces_data
-        except:
+        except Exception, inst:
+            print type(inst)     # the exception instance
+            print inst.args      # arguments stored in .args
+            print inst           # __str__ allows args to printed directly
             print "Exception while detecting images! Skipping image..."
     
     def main(self, fetchData):
@@ -87,13 +93,15 @@ class Controller:
             print image_location
             faces_data = self.__extractFaces(image_location, prefix + "_" + id)
             # faces_data = [face_data, face_data, ...]
-            # face_data = (org_image_id, face_image_id, face_rectangle)       
-            all_face_data.extend(faces_data)     
+            # face_data = (org_image_id, face_image_id, face_rectangle)
+            if faces_data is not None:
+                all_face_data.extend(faces_data)     
         print "Done extracting faces..."
         print all_face_data
-        for (org_image_id, face_image_id, face_rectangle) in all_face_data:
+        for face_data in all_face_data:
+            (org_image_id, face_image_id, face_rectangle) = face_data
             (ul, dr) = face_rectangle
-            print ul.x
+            self.facedataDB.addFaceData(face_data)
         return
         print "Normalizing faces..." # save normalized faces in GALLERY_NORM
         normalizer = FaceNormalizer()
@@ -109,7 +117,7 @@ if __name__ == "__main__":
     #address = "http://zellamsee.boereburg.nl/ZellamSee2008stapcamerafotos/stamcamera_%04d.jpg"
     
     start = 0 # images-url range should start with this number
-    end = 2 # last number of the images-url range
+    end = 17 # last number of the images-url range
     prefix = "BARL" # unique prefix for this photo-set
     fetchData = (address, start, end, prefix)
     controller.main(fetchData)
