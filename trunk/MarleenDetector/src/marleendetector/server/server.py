@@ -4,6 +4,7 @@ from cgi import parse_qs, escape
 
 from marleendetector.faces.faceorigins import *
 from marleendetector.server.generator.ImageHTML import *
+from marleendetector.server.generator.ImageListHTML import *
 
 class MDServerApp:
     """
@@ -34,15 +35,18 @@ class MDServerApp:
         #pprint.pprint(environ)
         #print start_response
         print "REQ_METHOD:" + str(self.environ['REQUEST_METHOD'])
+        
+        d = None
+        try:
+            request_body_size = int(self.environ['CONTENT_LENGTH'])
+            request_body = self.environ['wsgi.input'].read(request_body_size)
+            d = parse_qs(request_body)
+            print "data:" + str(d)
+        except (TypeError, ValueError), e:
+            traceback.print_exc(file=sys.stdout)
+            request_body = "0"        
         if self.environ['REQUEST_METHOD'] == 'POST':
-            try:
-                request_body_size = int(self.environ['CONTENT_LENGTH'])
-                request_body = self.environ['wsgi.input'].read(request_body_size)
-                d = parse_qs(request_body)
-                print "data:" + str(d)
-            except (TypeError, ValueError), e:
-                traceback.print_exc(file=sys.stdout)
-                request_body = "0"
+
             try:
                 local_image_id = d.get('image_id', [''])[0]
                 faces = self.database.getFaceData(local_image_id)
@@ -60,6 +64,8 @@ class MDServerApp:
             self.start_response(status, headers)
             yield response_body
         else:
+            responseHTML = ImageListHTML()
+            #response_body = str(responseHTML.getResponse())
             response_body = open(MDServerApp.FILE).read()
             status = '200 OK'
             headers = [('Content-type', 'text/html'),

@@ -3,8 +3,9 @@ Created on 3 apr 2009
 
 @author: rlindeman
 '''
+import PageHTML
 
-class ImageHTML(PageHTML):
+class ImageHTML(PageHTML.PageHTML):
 
 
     def __init__(self, imageOrigin, faces):
@@ -12,7 +13,7 @@ class ImageHTML(PageHTML):
         imageOrigin = tuple(id, org_image_name, local_image_id, local_path)
         faces = [Face, Face, ...]
         """
-        PageHTML.__init__(self)
+        PageHTML.PageHTML.__init__(self)
         self.imageOrigin = imageOrigin
         self.faces = faces
         pass
