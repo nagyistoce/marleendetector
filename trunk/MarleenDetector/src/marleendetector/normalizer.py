@@ -18,15 +18,16 @@ class FaceNormalizer:
         The FaceNormalizer normalizes the cropped_face_images to a standard size and gray-scale
     """
     
-    def __init__(self, cropped_faces_dir=GALLERY_CROPPED, norm_dir=GALLERY_NORM):
+    def __init__(self, prefix, cropped_faces_dir=GALLERY_CROPPED, norm_dir=GALLERY_NORM):
         """
-        Initializes the FaceNormalizer, 
+        Initializes the FaceNormalizer,
+        prefix the name of the image collection
         set cropped_faces_dir to link to the directory containing all the cropped faces
         set norm_dir to the directory where the normalized images should be saved
         """
-        self.cropped_faces_dir = cropped_faces_dir # non normalized faces location
-        self.norm_dir = norm_dir # normalized faces dir
-        pass
+        self.prefix = prefix
+        self.cropped_faces_dir = cropped_faces_dir + "\\" + prefix # non normalized faces location
+        self.norm_dir = norm_dir + "\\" + prefix # normalized faces dir
     
     def getCroppedFaceImages(self):
         """

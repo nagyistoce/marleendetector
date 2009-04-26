@@ -36,17 +36,18 @@ class MDServerApp:
         #print start_response
         print "REQ_METHOD:" + str(self.environ['REQUEST_METHOD'])
         
-        d = None
-        try:
-            request_body_size = int(self.environ['CONTENT_LENGTH'])
-            request_body = self.environ['wsgi.input'].read(request_body_size)
-            d = parse_qs(request_body)
-            print "data:" + str(d)
-        except (TypeError, ValueError), e:
-            traceback.print_exc(file=sys.stdout)
-            request_body = "0"        
+        
+      
         if self.environ['REQUEST_METHOD'] == 'POST':
-
+            d = None
+            try:
+                # get the POST varaibles
+                request_body_size = int(self.environ['CONTENT_LENGTH'])
+                request_body = self.environ['wsgi.input'].read(request_body_size)
+                d = parse_qs(request_body)
+                print "data:" + str(d)
+            except (TypeError, ValueError), e:
+                traceback.print_exc(file=sys.stdout)
             try:
                 local_image_id = d.get('image_id', [''])[0]
                 faces = self.database.getFaceData(local_image_id)
@@ -64,6 +65,12 @@ class MDServerApp:
             self.start_response(status, headers)
             yield response_body
         else:
+            # get the GET variables
+            query_string = self.environ['QUERY_STRING']
+            d = parse_qs(query_string)
+            print "query_string:" + str(d)
+            if "local_image_id" in d:
+                pass          
             responseHTML = ImageListHTML()
             #response_body = str(responseHTML.getResponse())
             response_body = open(MDServerApp.FILE).read()
