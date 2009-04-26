@@ -49,12 +49,13 @@ class ImageFetcher:
     
     def fetchImages(self):
         """
-            Images are stored in the current dir
+            Images are stored in the self.output_dir dir
+            Returns a list of tuples [(image_url, filename, filepath), ... ]
         """
         print "Fetching..."
         image_list = self.__generateImageList()
-        output_images = []
-        db = FaceOriginsDB()
+        output_images = [] # [(image_url, filename, filepath), ... ]
+
         # filename = "fetch" + str(index) + ".txt"
         for index, image_url in enumerate(image_list):
             print "Fetch " + image_url
@@ -62,14 +63,15 @@ class ImageFetcher:
             page1 = None
             try:
                 page1 = opener1.open(image_url)
-                my_picture = page1.read()
+                my_picture = page1.read() # read the image
                 filename = self.output_format % (index,) # insert the current index into the image file name
                 filepath = os.path.join(self.output_dir, filename)
-                print filepath
-                db.addImageOrigin(image_url, filename, filepath)
-                output_images.append(filepath)   
+                print filepath # we will save the file here
+                output_images.append((image_url, filename, filepath))
+                #db.addImageOrigin(image_url, filename, filepath)
+                #output_images.append(filepath)   
                 fout = open(filepath, "wb")
-                fout.write(my_picture)
+                fout.write(my_picture) # write the image to file
                 fout.close()
             except urllib2.HTTPError, inst:
                 print "HTTP Error occured at URL: " + image_url
@@ -77,7 +79,7 @@ class ImageFetcher:
             except urllib2.URLError, inst:
                 print "URL Error occured at URL: " + image_url
                 print inst
-        db.close()        
+        
         return output_images     
 
 if __name__ == '__main__':

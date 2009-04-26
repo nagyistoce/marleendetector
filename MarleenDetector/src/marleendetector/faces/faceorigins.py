@@ -46,7 +46,7 @@ class FaceOriginsDB:
         """
             Creates the ImageOrigin table
         """
-        self.cursor.execute('CREATE TABLE ImageOrigin (id INTEGER PRIMARY KEY, org_image_name VARCHAR, local_image_id VARCHAR)')
+        self.cursor.execute('CREATE TABLE ImageOrigin (id INTEGER PRIMARY KEY, org_image_name VARCHAR, local_image_id VARCHAR, local_path VARCHAR)')
         self.connection.commit()
             
     def __createFaceDataTable(self):
@@ -62,11 +62,25 @@ class FaceOriginsDB:
         """
             Returns a list of Face-objects
         """
-        self.cursor.execute('SELECT * FROM FaceData WHERE local_image_id = ? ORDER BY id', (local_image_id,))
+        print "getFaceData: " + str(local_image_id)
+        #local_image_id = "BARL_0001"
+        self.cursor.execute('SELECT * FROM FaceData WHERE local_image_id = ?', (str(local_image_id),))
+        faces = []
+        for row in self.cursor:
+            face = Face(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+            faces.append(face)
+        return faces
+    
+    def getImageOrigin(self, local_image_id):
+        """
+            Returns an Image Origin Row
+            tuple(id, org_image_name, local_image_id, local_path)
+        """
+        local_image_id = local_image_id + ".jpg"
+        self.cursor.execute("SELECT * FROM ImageOrigin WHERE local_image_id = ?", (local_image_id,))
         row = self.cursor.fetchone()
-        face = Face(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
-        return face
-
+        return row
+    
     def addImageOrigin(self, org_image_name, local_image_id, local_path):
         values_tuple = (org_image_name, local_image_id, local_path)
         self.cursor.execute('INSERT INTO ImageOrigin VALUES (NULL, ?, ?, ?)', values_tuple)
