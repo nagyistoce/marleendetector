@@ -81,17 +81,19 @@ class Controller:
         """
         address, start, end, prefix = fetchData
         print "Fetching images..."
-        #downloadImages = True # download all the images
         downloadImages = self.downloadImages # only use this when the images are already downloaded
         image_list = self.__fetchImages(address, prefix, start, end, fetch=downloadImages) # saves the images in GALLERY_LIBRARY
+        # image_list = [(image_url, filename, filepath), ... ]
         print "Done fetching images..."
-        
+        for org_image_name, local_image_id, local_path in image_list:
+            self.facedataDB.addImageOrigin(org_image_name, local_image_id, local_path)
+            
         all_face_data = []
         print "Extracting faces..." # saves the faces in GALLERY_CROPPED
-        for index, image_location in enumerate(image_list):
+        for index, (image_url, filename, filepath) in enumerate(image_list):
             id = "%04d" % (index, )
-            print image_location
-            faces_data = self.__extractFaces(image_location, prefix + "_" + id)
+            print filepath
+            faces_data = self.__extractFaces(filepath, prefix + "_" + id)
             # faces_data = [face_data, face_data, ...]
             # face_data = (org_image_id, face_image_id, face_rectangle)
             if faces_data is not None:
@@ -111,7 +113,7 @@ class Controller:
 if __name__ == "__main__":
     # run main program
     controller = Controller()
-    #controller.downloadImages = True # download the images
+    controller.downloadImages = True # download the images
     # %-formatted url, only one format variable is allowed
     address = "http://www.boereburg.nl/BZBALLEREMMENLOS/bzb23012009_%03d.jpg"
     #address = "http://zellamsee.boereburg.nl/ZellamSee2008stapcamerafotos/stamcamera_%04d.jpg"
