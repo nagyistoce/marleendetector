@@ -27,14 +27,16 @@ class FaceDetectorManager:
         Provide it with an image and it will use all its haarclassifiers to detect faces. 
     """
 
-    def __init__(self, image_location, name, output_dir=GALLERY_CROPPED):
+    def __init__(self, image_location, prefix, name, output_dir=GALLERY_CROPPED):
         """
             Initializes the FaceDetectorManager, loads the Detector, loads (and formats) the image
             @param image_location: the full path to the image file
-            @param name: a readable name for the image
+            @param prefix: the name of the collection this image belongs to
+            @param name: a readable unique name for the image
             @param output_dir: path to the dirctory where the extracted faces will be saved  
         """
         self.name = name # a readable name for the current image
+        self.prefix = prefix
         self.detect = Detector() # init the face detector
         self.detect.input_name = image_location # the file with faces
         self.detect.loadImage() # load the image in the detector
@@ -42,7 +44,7 @@ class FaceDetectorManager:
         self.detect.generateSmallImage()
         self.rectangle_list = [] # list of tuples e.g. (point_left_up, point_right_down)
         self.super_faces = []
-        self.outputdir = output_dir
+        self.outputdir = output_dir + "\\" + prefix 
     
     def startDetection(self):
         """

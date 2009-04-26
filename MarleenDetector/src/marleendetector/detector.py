@@ -95,7 +95,10 @@ class Detector:
         #cvShowImage( "super face", cropped ); # show face in window
         #int cvSaveImage( const char* filename, const CvArr* image );
         #filename = self.basedir + "\\crop_face.jpg"
-        cvSaveImage(location, cropped)
+        try:
+            cvSaveImage(location, cropped)
+        except:
+            print "EXCEPTION"
         
     
     def draw(self, faces, colourname="red", colourindex=None):

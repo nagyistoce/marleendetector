@@ -108,3 +108,14 @@ class FaceOriginsDB:
         # We can also close the cursor if we are done with it
         self.cursor.close()
         self.connection.close()        
+
+if __name__ == "__main__":
+    print "main"
+    if False:
+        db_location = GALLERY_DATABASE + "\\faces.db"
+        connection = sqlite.connect(db_location)
+        cursor = connection.cursor()
+        cursor.execute('DROP TABLE FaceData')
+        cursor.execute('DROP TABLE ImageOrigin')
+        connection.commit()
+    

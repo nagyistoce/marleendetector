@@ -30,9 +30,11 @@ class ImageFetcher:
     def __generateImageList(self):
         """
             generate a list of image location on the web
+            returns [(id, address), ...]
         """
         seq = range(self.start_number, self.end_number)
         list = map(lambda x: self.address % (x, ), seq)
+        list = zip(seq, list)
         return list
     
     def getOutputImages(self):
@@ -50,14 +52,14 @@ class ImageFetcher:
     def fetchImages(self):
         """
             Images are stored in the self.output_dir dir
-            Returns a list of tuples [(image_url, filename, filepath), ... ]
+            Returns a list of tuples [(index, image_url, filename, filepath), ... ]
         """
         print "Fetching..."
         image_list = self.__generateImageList()
         output_images = [] # [(image_url, filename, filepath), ... ]
 
         # filename = "fetch" + str(index) + ".txt"
-        for index, image_url in enumerate(image_list):
+        for index, image_url in image_list:
             print "Fetch " + image_url
             opener1 = urllib2.build_opener()
             page1 = None
@@ -67,7 +69,7 @@ class ImageFetcher:
                 filename = self.output_format % (index,) # insert the current index into the image file name
                 filepath = os.path.join(self.output_dir, filename)
                 print filepath # we will save the file here
-                output_images.append((image_url, filename, filepath))
+                output_images.append((index, image_url, filename, filepath))
                 #db.addImageOrigin(image_url, filename, filepath)
                 #output_images.append(filepath)   
                 fout = open(filepath, "wb")
