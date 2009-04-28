@@ -2,7 +2,7 @@ import os
 import re
 import shutil
 from marleendetector.image_util import *
-#from marleendetector.normalizer import *
+
 
 GALLERY_LOCATION = "C:\\Documents and Settings\\rlindeman\\My Documents\\TU\\PTG\\workspace\\MarleenDetector\\gallery"
 GALLERY_LIBRARY = GALLERY_LOCATION + "\\library"

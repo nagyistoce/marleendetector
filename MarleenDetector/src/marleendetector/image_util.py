@@ -1,4 +1,4 @@
-from opencv.highgui import *
+#from opencv.highgui import *
 
 def getDimension(image_location):
     """
