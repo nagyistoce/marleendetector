@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'match-app.ui'
 #
-# Created: Sun Apr 26 22:52:33 2009
+# Created: Tue Apr 28 16:16:42 2009
 #      by: PyQt4 UI code generator 4.4.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -18,6 +18,7 @@ class Ui_MainWindow(object):
         self.selectedImageLabel = QtGui.QLabel(self.centralwidget)
         self.selectedImageLabel.setGeometry(QtCore.QRect(10, 30, 200, 200))
         self.selectedImageLabel.setStyleSheet("background-color: rgb(200, 200, 200);")
+        self.selectedImageLabel.setScaledContents(True)
         self.selectedImageLabel.setObjectName("selectedImageLabel")
         self.label = QtGui.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(10, 10, 91, 16))
@@ -25,6 +26,7 @@ class Ui_MainWindow(object):
         self.matchImageLabel = QtGui.QLabel(self.centralwidget)
         self.matchImageLabel.setGeometry(QtCore.QRect(250, 30, 200, 200))
         self.matchImageLabel.setStyleSheet("background-color: rgb(200, 200, 200);")
+        self.matchImageLabel.setScaledContents(True)
         self.matchImageLabel.setObjectName("matchImageLabel")
         self.label_2 = QtGui.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(250, 10, 131, 16))

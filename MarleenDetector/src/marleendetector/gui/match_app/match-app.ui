@@ -1,4 +1,4 @@
-<ui version="4.0" >
+<ui version="4.0" language="jambi" >
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow" >
   <property name="geometry" >
@@ -28,6 +28,9 @@
     <property name="text" >
      <string>selected image</string>
     </property>
+    <property name="scaledContents" >
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QLabel" name="label" >
     <property name="geometry" >
@@ -56,6 +59,9 @@
     </property>
     <property name="text" >
      <string>match image</string>
+    </property>
+    <property name="scaledContents" >
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_2" >
