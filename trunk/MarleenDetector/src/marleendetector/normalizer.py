@@ -2,15 +2,15 @@
 import os
 import re
 
-from opencv.cv import *
-from opencv.highgui import *
+from opencv import cv
+from opencv import highgui
 
 from marleendetector.gallerymanager import *
 
 
 
 NORM_FILENAME = "norm_%04d.jpg"
-DEFAULT_FACE_SIZE = 400
+DEFAULT_FACE_SIZE = 200
 
 
 class FaceNormalizer:
@@ -28,6 +28,10 @@ class FaceNormalizer:
         self.prefix = prefix
         self.cropped_faces_dir = cropped_faces_dir + "\\" + prefix # non normalized faces location
         self.norm_dir = norm_dir + "\\" + prefix # normalized faces dir
+        self.startCallback = None # function to call before normalizing
+        self.iterCallback = None # function to call after every image
+        self.filecount = 0
+        self.index = 0
     
     def getCroppedFaceImages(self):
         """
@@ -48,7 +52,7 @@ class FaceNormalizer:
             # cropped faces images have the following filename-format [0-9]*4_cropface_[0-9]*4.jpg
             print fname
             image_location = self.cropped_faces_dir + "\\" + fname
-            image = cvLoadImage(image_location, 1) # a cropped non-normalized image
+            image = highgui.cvLoadImage(image_location, 1) # a cropped non-normalized image
 
             print "width: " + str(image.width)
             print "height: " + str(image.height)
@@ -58,24 +62,33 @@ class FaceNormalizer:
                 max_width = image.width
         return max_width
     
-    def normalizeFaces(self, useDefaultSize=True):
+    def normalizeFaces(self, useSize=True, size=None):
         """
             Normalizes all the images in the cropped_faces_dir
         """
-        max_size = DEFAULT_FACE_SIZE
-        if useDefaultSize == False:
+        max_size = 0
+        if size == None:
+            # use default size if none
+            size = DEFAULT_FACE_SIZE
+            
+        if useSize == False:
             # use the maximum face size found
             max_size = self.__findMaxSize()
+        else:
+            max_size = size
             
         # loop over the original images
         cropped_files = self.getCroppedFaceImages()
-        filecount = len(cropped_files)
-        last_percentage = 0
-        print "Normalizing " + str(filecount) + " images"
+        self.filecount = len(cropped_files)
+
+        if self.startCallback is not None:
+            self.startCallback(self.filecount)
+            
+        print "Normalizing " + str(self.filecount) + " images"
         for index, fname in enumerate(cropped_files):
             image_location = self.cropped_faces_dir + "\\" + fname
-            image = cvLoadImage(image_location, 1) # a cropped non-normalized image
-    
+
+            image = highgui.cvLoadImage(image_location, 1) # a cropped non-normalized image
             p = re.compile(CROPFACE_FILENAME_PATTERN)
             m = p.match(fname)
             prefix = m.group("prefix")
@@ -86,27 +99,26 @@ class FaceNormalizer:
 
             norm_filename = prefix + "_" + image_index + "_norm_" + face_index + ".jpg"
             location = self.norm_dir + "\\" + norm_filename
-            cvSaveImage(location, norm_image) # save the image to file
-            # print some statistics
-            if (index % 10 == 0):
-                percentage =  (index*100/filecount)
-                if (percentage > last_percentage):
-                    print "Percentage Done: " + str(percentage)
+            highgui.cvSaveImage(location, norm_image) # save the image to file
+            
+            if self.iterCallback is not None:
+                self.iterCallback(index)
+
             
 
     def __normImage(self, img, length):
-        print "Generating norm image..."
+        #print "Generating norm image..."
         width = length
         height = length
-        gray = cvCreateImage(cvSize(img.width,img.height), 8, 1);
-        small_img = cvCreateImage(cvSize(cvRound(width),
-                                           cvRound(height)), 8, 1 );
+        gray = cv.cvCreateImage(cv.cvSize(img.width,img.height), 8, 1);
+        small_img = cv.cvCreateImage(cv.cvSize(cv.cvRound(width),
+                                           cv.cvRound(height)), 8, 1 );
     
         # convert color input image to grayscale
-        cvCvtColor(img, gray, CV_BGR2GRAY);
+        cv.cvCvtColor(img, gray, cv.CV_BGR2GRAY);
         # scale input image for faster processing
-        cvResize(gray, small_img, CV_INTER_LINEAR);
-        cvEqualizeHist(small_img, small_img);
+        cv.cvResize(gray, small_img, cv.CV_INTER_LINEAR);
+        cv.cvEqualizeHist(small_img, small_img);
         #cvClearMemStorage(self.storage);
         norm_image = small_img # save the 'normalized image'
         return norm_image
@@ -132,21 +144,24 @@ class ImageResizer:
         width = size
         height = size
         
-        input_image = cvLoadImage(image_location, 1) # flag: >0 the loaded image is forced to be a 3-channel color image
+        input_image = highgui.cvLoadImage(image_location, 1) # flag: >0 the loaded image is forced to be a 3-channel color image
         
-        output_image = cvCreateImage(cvSize(cvRound(width), cvRound(height)), 8, 3);
-        cvResize(input_image, output_image, CV_INTER_LINEAR);
-        cvSaveImage(ouput_location, output_image) # save the image to file
+        output_image = cv.cvCreateImage(cv.cvSize(cv.cvRound(width), cv.cvRound(height)), 8, 3);
+        cv.cvResize(input_image, output_image, cv.CV_INTER_LINEAR);
+        highgui.cvSaveImage(ouput_location, output_image) # save the image to file
         
 if __name__ == "__main__":
     print "run main"
     resizer = ImageResizer()
     size = 200
-    image_location = GALLERY_LOCATION + "\\test\\sample_dennis\\ZAS1_0000_norm_0000.jpg"
+    image_location = GALLERY_LOCATION + "\\cropped\\BARL\\BARL_0001_cropface_0000.jpg"
+    ouput_location = GALLERY_LOCATION + "\\norm\\BARL\\BARL_0001_norm_0000.jpg"
+    #image_location = GALLERY_LOCATION + "\\test\\sample_dennis\\ZAS1_0000_norm_0000.jpg"
     crop = GALLERY_CROPPED
     print crop
     print image_location
-    ouput_location = GALLERY_LOCATION + "\\test\\sample_dennis\\ZAS1_0000_norm_0000.jpg"
+    #ouput_location = GALLERY_LOCATION + "\\test\\sample_dennis\\ZAS1_0000_norm_0000.jpg"
     resizer.resizeImage(image_location, ouput_location, size)
     print isCropfaceFilename(ouput_location)
-    
+    norma = FaceNormalizer("BARL")
+    norma.normalizeFaces()
