@@ -93,7 +93,7 @@
    <widget class="QPushButton" name="matchButton" >
     <property name="geometry" >
      <rect>
-      <x>250</x>
+      <x>460</x>
       <y>240</y>
       <width>75</width>
       <height>23</height>
@@ -124,6 +124,19 @@
     </property>
     <property name="text" >
      <string>Log</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="selectDirButton" >
+    <property name="geometry" >
+     <rect>
+      <x>250</x>
+      <y>240</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Select dir</string>
     </property>
    </widget>
   </widget>

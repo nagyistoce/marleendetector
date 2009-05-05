@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'match-app.ui'
 #
-# Created: Tue Apr 28 16:16:42 2009
+# Created: Fri May 01 16:10:08 2009
 #      by: PyQt4 UI code generator 4.4.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -35,7 +35,7 @@ class Ui_MainWindow(object):
         self.loadImageButton.setGeometry(QtCore.QRect(10, 240, 75, 23))
         self.loadImageButton.setObjectName("loadImageButton")
         self.matchButton = QtGui.QPushButton(self.centralwidget)
-        self.matchButton.setGeometry(QtCore.QRect(250, 240, 75, 23))
+        self.matchButton.setGeometry(QtCore.QRect(460, 240, 75, 23))
         self.matchButton.setObjectName("matchButton")
         self.textBrowser = QtGui.QTextBrowser(self.centralwidget)
         self.textBrowser.setGeometry(QtCore.QRect(460, 30, 256, 201))
@@ -43,6 +43,9 @@ class Ui_MainWindow(object):
         self.label_3 = QtGui.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(460, 10, 46, 14))
         self.label_3.setObjectName("label_3")
+        self.selectDirButton = QtGui.QPushButton(self.centralwidget)
+        self.selectDirButton.setGeometry(QtCore.QRect(250, 240, 75, 23))
+        self.selectDirButton.setObjectName("selectDirButton")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -64,4 +67,5 @@ class Ui_MainWindow(object):
         self.loadImageButton.setText(QtGui.QApplication.translate("MainWindow", "Load Image", None, QtGui.QApplication.UnicodeUTF8))
         self.matchButton.setText(QtGui.QApplication.translate("MainWindow", "Match", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("MainWindow", "Log", None, QtGui.QApplication.UnicodeUTF8))
+        self.selectDirButton.setText(QtGui.QApplication.translate("MainWindow", "Select dir", None, QtGui.QApplication.UnicodeUTF8))
 
