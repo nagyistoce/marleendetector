@@ -6,14 +6,15 @@ from util_app import *
 from marleendetector.normalizer import *
 import marleendetector.gallerymanager
 
+
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         # add worker thread
-        self.normThread = None
-        
+        self.normThread = None # Thread will normalize images
+        self.downloadThead = None # Thread will download images from the web
         self.ui.resize_basedirectory_lineEdit.setText(GALLERY_LOCATION)
         self.fillDirectoryList()
         
@@ -81,8 +82,22 @@ class StartQT4(QtGui.QMainWindow):
         # start the Thread
         self.normThread.start()
                 
+                
+class DownloadWorker(QtCore.QThread):
+    """
+        The DownloadWorker is a QThread which will download a list of images from the web and save them to a specific directory
+    """
+    
+    def __init__(self, parent):
+        QtCore.QThread.__init__(self, parent)
+
 
 class NormalizeWorker(QtCore.QThread):
+    """
+        The NormalizeWorker is a QThread which will normalize a list of images.
+        This QThread will emit a SIGNAL before starting and after every image, 
+        connect these SLOTs to a progressbar to show the normalization progress.
+    """
 
     def __init__(self, parent = None, prefix=None, size=None):
         """
