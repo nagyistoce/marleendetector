@@ -12,7 +12,7 @@ class MatchResult:
         self.matchfile = None
         self.mindist = None
     
-    def updateDisplay(self, error,numOfEigenfaces,matchfile,mindist):
+    def updateDisplay(self, error, numOfEigenfaces, matchfile, mindist):
         print "== UPDATE DISPLAY =="
         print "error: " + str(error)
         print "numOfEigenfaces: " + str(numOfEigenfaces)
@@ -27,7 +27,7 @@ class MatchResult:
 class PyFacesWrapper:
     
     def __init__(self):
-        self.controller=pyfacescontroller.PyFaceController()
+        self.controller = pyfacescontroller.PyFaceController()
         #self.controller=PyFaces.PyFaceController()
         self.controller.myapp = MatchResult()  
     
@@ -45,14 +45,14 @@ class PyFacesWrapper:
         # Eigen faces
         selectedEigenFaces = 6
         
-        self.controller.validateSelection(selectedFileName,selectedDirectoryName,selectedEigenFaces,thresholdvalue)
+        self.controller.validateSelection(selectedFileName, selectedDirectoryName, selectedEigenFaces, thresholdvalue)
         return self.controller.myapp # return an object with all result data
 
 if __name__ == "__main__":
     pyfaceWrapper = PyFacesWrapper()
     selectedFileName = GALLERY_LOCATION + "/norm/BARL/BARL_0009_norm_0000.jpg"
     selectedDirectoryName = GALLERY_LOCATION + "/test/sample_dennis"
-    data = pyfaceWrapper.recognize(selectedFileName=selectedFileName,selectedDirectoryName=selectedDirectoryName)
+    data = pyfaceWrapper.recognize(selectedFileName=selectedFileName, selectedDirectoryName=selectedDirectoryName)
     print "Image %s matches %s." % (data.unknownFaceFileName, data.matchfile)
  
     
