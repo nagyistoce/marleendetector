@@ -1,6 +1,25 @@
-#from test.detector import *
+import marleendetector.database.dbconnection as dbconnection
 import numpy
-# Some utility methods that take rectangles as a input
+
+class Rectangle:
+    
+    def __init__(self, ul_x, ul_y, dr_x, dr_y):
+        if not (ul_x < dr_x and ul_y > dr_y):
+            raise ValueError("Up left should really be the upper left corner");
+        self.ul_x = ul_x
+        self.ul_y = ul_y
+        self.dr_x = dr_x
+        self.dr_y = dr_y
+        
+    def overLapsWith(self, rectangle):
+        #print "%s < %s and %s > %s and %s > %s and %s < %s" % (self.ul_x, rectangle.dr_x, self.dr_x, rectangle.ul_x, self.ul_y, rectangle.dr_y, self.dr_y, rectangle.ul_y)
+        return self.ul_x < rectangle.dr_x and self.dr_x > rectangle.ul_x and self.ul_y > rectangle.dr_y and self.dr_y < rectangle.ul_y
+
+def overlapArea():
+    """
+        Returns the area of overlap
+    """
+    
 
 def generate_super_rectangle(rec_list):
     """
@@ -74,15 +93,15 @@ def generateBitMap(rectangle_list):
     print "circle done"
 
 
-if __name__ == '__main__':
-    rec_list = [(cvPoint(196,223), cvPoint(245,273)), (cvPoint(383,165), cvPoint(425,206)), (cvPoint(195,222), cvPoint(247,274)), (cvPoint(321,221), cvPoint(371,271)), (cvPoint(106,235), cvPoint(159,288)), (cvPoint(188,215), cvPoint(260,287)), (cvPoint(322,224), cvPoint(367,270)), (cvPoint(193,221), cvPoint(247,274)), (cvPoint(196,222), cvPoint(247,273)), (cvPoint(323,222), cvPoint(370,269)), (cvPoint(105,235), cvPoint(158,288)), (cvPoint(188,214), cvPoint(257,283))]
-    #rect_list = [(cvPoint(383,165), cvPoint(425,206)), (cvPoint(195,222), cvPoint(247,274)), (cvPoint(321,221), cvPoint(371,271)), (cvPoint(106,235), cvPoint(159,288)), (cvPoint(188,215), cvPoint(260,287)), (cvPoint(322,224), cvPoint(367,270)), (cvPoint(193,221), cvPoint(247,274)), (cvPoint(196,222), cvPoint(247,273)), (cvPoint(323,222), cvPoint(370,269)), (cvPoint(105,235), cvPoint(158,288)), (cvPoint(188,214), cvPoint(257,283))]
-    #rec = (cvPoint(196,223), cvPoint(245,273))
-    disjunct = []
-    index = 0
-    for rec in rec_list:
-        print str(index) + " " + str(rec)
-        list = get_overlappingrectangles(rec, rec_list)
-        if list not in disjunct:
-            disjunct.append(list)
-    print "set size" + str(len(disjunct))
+if __name__ == "__main__":
+    print "Main"
+    db = dbconnection.DBConnection()
+    rows = db.executeQuery("SELECT local_image_id FROM FaceData GROUP BY local_image_id HAVING COUNT(*) > 1");
+    for row in rows:
+        #query = "SELECT * FROM FaceData WHERE local_image_id = %s" % row
+        #print query
+        print str(row)
+        images = db.executePQuery("SELECT * FROM FaceData WHERE local_image_id = ?", row);
+        print images
+        for image in images:
+            id, local_image_id, face_image_id, ul_x, ul_y, dr_x, dr_y = image
