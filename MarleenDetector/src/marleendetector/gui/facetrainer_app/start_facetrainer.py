@@ -3,7 +3,7 @@ import operator
 
 from PyQt4 import QtCore, QtGui
 
-from facestrainer import *
+from facetrainer import *
 from marleendetector.faces.facesdb import *
 
 class StartQT4(QtGui.QMainWindow):
