@@ -17,3 +17,6 @@ class Face:
         self.ul_y = ul_y
         self.dr_x = dr_x
         self.dr_y = dr_y
+        
+    def __str__(self):
+        return "Face ul_x=%s, ul_y=%s, dr_x=%s, dr_y=%s" % (self.ul_x, self.ul_y, self.dr_x, self.dr_y)
