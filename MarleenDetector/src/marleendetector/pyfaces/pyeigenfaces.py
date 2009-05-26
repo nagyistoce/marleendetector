@@ -57,6 +57,7 @@ class egface:
     def validateSelectedImage(self, imgname):
         """
             Check if the image conforms to the height/width of the images in the bundle
+            Returns the XImage
         """
         print "validateSelectedImage()"               
         selectimg = imageops.XImage(imgname) # image (flat list)
@@ -70,14 +71,14 @@ class egface:
         
     def findMatchingImage(self, imagename, selectedfacesnum, thresholdvalue):
         """
-            Finds a matching image
+            Finds a matching image from the bundle
         """
         print "findMatchingImage()" 
-        selectimg = self.validateSelectedImage(imagename)
-        inputfacepixels = selectimg._pixellist
-        inputface = asfarray(inputfacepixels)
-        pixlistmax = max(inputface)
-        inputfacen = inputface / pixlistmax        
+        selectimg = self.validateSelectedImage(imagename) # returns the image
+        inputfacepixels = selectimg._pixellist # image flat pixel list
+        inputface = asfarray(inputfacepixels) # float[]
+        pixlistmax = max(inputface) # max value
+        inputfacen = inputface / pixlistmax   # norm-array: divide all values by max      
         inputface = inputfacen - self.bundle.avgvals
         usub = self.bundle.eigenfaces[:selectedfacesnum, :]
         input_wk = dot(usub, inputface.transpose()).transpose()        
@@ -95,6 +96,9 @@ class egface:
         return mindist, result
     
     def doCalculations(self, dir, imglist, selectednumeigenfaces):
+        """
+            Create bundle, calculate weights
+        """
         print "doCalculations()"        
         self.createFaceBundle(imglist);        
         egfaces = self.bundle.eigenfaces
@@ -112,6 +116,7 @@ class egface:
             Validates the images in the list:
             The length of imgfilenameslist should be greater than zero.
             All the images should have the same dimension.
+            Returns a list of XImage
         """
         print "validatedirectory()"        
         if (len(imgfilenameslist) == 0):
@@ -139,21 +144,24 @@ class egface:
         return wts           
             
     def createFaceBundle(self, imglist):
+        """
+            Create a face bundle from the image list
+        """
         print "createFaceBundle()"        
-        imgfilelist = self.validateDirectory(imglist)
+        imgfilelist = self.validateDirectory(imglist) # list of XImage
         
         img = imgfilelist[0]
         imgwdth = img._width
         imght = img._height
-        numpixels = imgwdth * imght
-        numimgs = len(imgfilelist)               
+        numpixels = imgwdth * imght # number of pixels in each image
+        numimgs = len(imgfilelist) # total number of images        
         #trying to create a 2d array ,each row holds pixvalues of a single image
-        facemat = zeros((numimgs, numpixels))               
+        facemat = zeros((numimgs, numpixels)) # face matrix         
         for i in range(numimgs):
-            pixarray = asfarray(imgfilelist[i]._pixellist)
+            pixarray = asfarray(imgfilelist[i]._pixellist) # get pixel array of image
             pixarraymax = max(pixarray)
-            pixarrayn = pixarray / pixarraymax                        
-            facemat[i, :] = pixarrayn           
+            pixarrayn = pixarray / pixarraymax # normalize array                 
+            facemat[i, :] = pixarrayn # add array to matrix          
         
         #create average values ,one for each column(ie pixel)        
         avgvals = average(facemat, axis=0)        
@@ -215,7 +223,7 @@ class egface:
             imgdata = xnew[x]
             imageops.make_image(imgdata, filename, (self.bundle.wd, self.bundle.ht), True)
     
-    def createEigenimages(self, eigenspace):                
+    def createEigenimages(self, eigenspace):
         egndir = '../eigenfaces'        
         try:
             if isdir(egndir):                

@@ -4,21 +4,119 @@ import numpy
 class Rectangle:
     
     def __init__(self, ul_x, ul_y, dr_x, dr_y):
+        if (ul_x > dr_x):
+            # swap x values...
+            temp = ul_x
+            ul_x = dr_x
+            dr_x = temp
+        if (ul_y < dr_y):
+            # swap y values...
+            temp = ul_y
+            ul_y = dr_y
+            dr_y = temp
         if not (ul_x < dr_x and ul_y > dr_y):
-            raise ValueError("Up left should really be the upper left corner");
+            raise ValueError("Up left should really be the upper left corner. ul_x(%s) < dr_x(%s) and ul_y(%s) > dr_y(%s)" % (ul_x, dr_x, ul_y, dr_y));
         self.ul_x = ul_x
         self.ul_y = ul_y
         self.dr_x = dr_x
         self.dr_y = dr_y
         
+    def width(self):
+        return self.dr_x - self.ul_x
+    
+    def height(self):
+        return self.ul_y - self.dr_y
+        
+    def size(self):
+        return self.height() * self.width()
+    
     def overLapsWith(self, rectangle):
         #print "%s < %s and %s > %s and %s > %s and %s < %s" % (self.ul_x, rectangle.dr_x, self.dr_x, rectangle.ul_x, self.ul_y, rectangle.dr_y, self.dr_y, rectangle.ul_y)
         return self.ul_x < rectangle.dr_x and self.dr_x > rectangle.ul_x and self.ul_y > rectangle.dr_y and self.dr_y < rectangle.ul_y
 
-def overlapArea():
+
+    def overLapRectange(self, rectangle):
+        """
+            returns the Rectangle that defines the overlap
+        """
+        if not self.overLapsWith(rectangle):
+            return Rectangle(0, 0, 0, 0)
+        else:
+            x_min = min(self.dr_x, rectangle.dr_x)
+            x_max = max(self.ul_x, rectangle.ul_x)
+            y_min = min(self.ul_y, rectangle.ul_y)
+            y_max = max(self.dr_y, rectangle.dr_y)
+            #return Rectangle(ul_x, ul_y, dr_x, dr_y)
+            return Rectangle(x_min, y_max, x_max, y_min)
+        
+    def overLapSize(self, rectangle):
+        """
+        Returns the size of the overlap area of the rectangles
+        """
+        if not self.overLapsWith(rectangle):
+            return 0
+        else:
+            x_overlap = min(self.dr_x, rectangle.dr_x) - max(self.ul_x, rectangle.ul_x)
+            y_overlap = min(self.ul_y, rectangle.ul_y) - max(self.dr_y, rectangle.dr_y)
+            overlap = x_overlap * y_overlap          
+            return overlap
+        
+    def overlapPercentage(self, rectangle):
+        overlap = self.overLapSize(rectangle)
+        sumsize = self.size() + rectangle.size() - overlap
+        per = (float(overlap) / float(sumsize)) * 100
+        return per
+        
+THRESHOLD_OVERLAP = 60
+
+class Cluster:
+    
+    def __init__(self):
+        self.items = []
+        
+    def checkOverlap(self, rectangle):
+        return map(rectangle.overlapPercentage, self.items)
+            
+    def inCluster(self, rectangle):
+        belowThreshold = filter(lambda x: x < THRESHOLD_OVERLAP, self.checkOverlap(rectangle))
+        minAreaPercentage = min(self.checkOverlap(rectangle))
+        return (len(belowThreshold) == 0, minAreaPercentage)
+        
+    def __str__(self):
+        
+        return "<Cluster size=%s>" % (len(self.items), )
+def clusterRectangles(rectangles):
     """
-        Returns the area of overlap
+        If rectangles overlap above a certain threshold they are placed in the same cluster
+        otherwise a new cluster is created
     """
+    clusters = []
+    for rectangle in rectangles:
+        if len(clusters) == 0:
+            # no cluster, create cluster
+            cluster = Cluster()
+            cluster.items.append(rectangle)
+            clusters.append(cluster)
+        else:
+            # find a cluster with rectangles that have an overlap area above threshold
+            overlaps = zip(map(lambda x: x.inCluster(rectangle), clusters), clusters)
+            if len(filter(lambda x: x[0][0], overlaps)) > 0:
+                # add to cluster with max overlap
+                maxClusterData = max(overlaps, key=lambda k: k[0][0])
+                maxClusterData[1].items.append(rectangle)
+            else:
+                # rectangle does not fit in another cluster, create a new one
+                cluster = Cluster()
+                cluster.items.append(rectangle)
+                clusters.append(cluster)                
+            #print overlaps
+    return clusters
+         
+def getRectangleFromFace(face):
+    """
+        Converts a Face to a Rectangle
+    """
+    return Rectangle(face.ul_x, face.ul_y, face.dr_x, face.dr_y)
     
 
 def generate_super_rectangle(rec_list):
