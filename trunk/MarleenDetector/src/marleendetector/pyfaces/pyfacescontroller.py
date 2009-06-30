@@ -24,6 +24,9 @@ class PyFaceController(object):
             1. validates the filename and the directory
             2. validate the images in the directory
             3. execute the algorithm
+            
+            @param numOfEigenfaces: the number of eigen faces that will be used
+            @param thresholdVal: the threshild value for the minimum distance
         """
         print 'validateSel()::filename=', fileName, 'dir=:', directoryName, 'thresh=:', thresholdVal, 'numOfEigenfaces=:', numOfEigenfaces        
         

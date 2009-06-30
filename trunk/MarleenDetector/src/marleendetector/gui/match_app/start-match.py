@@ -138,7 +138,7 @@ class MatchWorker(QtCore.QThread):
         
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
-    myapp = StartQT4()
-    myapp.show()
+    window = StartQT4()
+    window.show()
     sys.exit(app.exec_())
 

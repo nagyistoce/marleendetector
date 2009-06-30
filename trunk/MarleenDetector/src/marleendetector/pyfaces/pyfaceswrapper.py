@@ -32,6 +32,7 @@ class PyFacesWrapper:
     # Threshold value
     DEFAULT_THRESHOLD = 2.0
     # Eigen faces
+    #DEFAULT_EIGENFACES = 6
     DEFAULT_EIGENFACES = 6
     
     def __init__(self, thresholdvalue=DEFAULT_THRESHOLD, selectedEigenFaces=DEFAULT_EIGENFACES):
