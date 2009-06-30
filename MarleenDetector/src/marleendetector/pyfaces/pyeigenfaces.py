@@ -47,6 +47,7 @@ class FaceBundle:
             @param wd: the width of all the images in the bundle
             @param ht: the height of all the images in the bundle
             @param adjfaces: matrix where each row represents a flat normalized image-array with the average pixelvalue substracted
+            @param fspace: fspace
             @param avgvals: array with average values for each pixel location (avgvals.length = wd*ht)
             @param evals: array of size image-list with sorted eigen values (max -> min)
         """
@@ -113,7 +114,7 @@ class egface:
         print "doCalculations()"        
         self.createFaceBundle(imglist);        
         egfaces = self.bundle.eigenfaces
-        adjfaces = self.bundle.adjfaces
+        adjfaces = self.bundle.adjfaces # matrix where each row represents a flat normalized image-array with the average pixelvalue substracted
         self.weights = self.calculateWeights(egfaces, adjfaces, selectednumeigenfaces)
         
         #write to cache
@@ -149,15 +150,18 @@ class egface:
         return imgfilelist
     
     def calculateWeights(self, eigenfaces, adjfaces, selectedfacesnum):
+        """
+            @param selectedfacesnum: number of eigen faces to use
+        """
         print "calculateweights()"                
-        usub = eigenfaces[:selectedfacesnum, :]        
+        usub = eigenfaces[:selectedfacesnum, :] # get the first selectedfacesnum rows   
         wts = dot(usub, adjfaces.transpose()).transpose()                         
         return wts           
             
     def createFaceBundle(self, imglist):
         """
             Creates a face bundle from the image list
-            
+            and saves the eigenface images to the eigenfaces-dir
             @param imglist: list of image filenames
         """
         print "createFaceBundle()"        
@@ -180,7 +184,7 @@ class egface:
         # each value stands for the average of the pixel in all images, thus we have an array of lenght numpixels  
         avgvals = average(facemat, axis=0)
         #make average faceimage in currentdir just for fun viewing..
-        #imageops.make_image(avgvals,"average.png",(imgwdth,imght))               
+        imageops.make_image(avgvals,"average.png",(imgwdth,imght))               
         #substract avg val from each orig val to get adjusted faces(phi of T&P)     
         adjfaces = facemat - avgvals
         adjfaces_tr = adjfaces.transpose()        
@@ -218,7 +222,7 @@ class egface:
                 newwt[i][j] = self.weights[i][j] * evalssub[j]        
         phinew = dot(newwt, usub)    
         
-        xnew = phinew + self.bundle.avgvals
+        xnew = phinew + self.bundle.avgvals # array with average values for each pixel location (avgvals.length = wd*ht)
         try:
             if isdir(recondir):                             
                 rmtree(recondir, True)                
@@ -239,7 +243,8 @@ class egface:
     
     def createEigenimages(self, eigenspace):
         """
-            Creates the eigenfaces, each row in the eigenspace matrix represents an image as flat-array
+            Creates the eigenfaces and saves them,
+            each row in the eigenspace matrix represents an image as flat-array
         """
         egndir = '../eigenfaces'        
         try:
