@@ -25,13 +25,29 @@ class MatchResult:
         
 
 class PyFacesWrapper:
+    """
+        A wrapper around the pyfaces controller
+    """
     
-    def __init__(self):
+    # Threshold value
+    DEFAULT_THRESHOLD = 2.0
+    # Eigen faces
+    DEFAULT_EIGENFACES = 6
+    
+    def __init__(self, thresholdvalue=DEFAULT_THRESHOLD, selectedEigenFaces=DEFAULT_EIGENFACES):
         self.controller = pyfacescontroller.PyFaceController()
         #self.controller=PyFaces.PyFaceController()
         self.controller.myapp = MatchResult()  
+        self.thresholdvalue = thresholdvalue
+        self.selectedEigenFaces = selectedEigenFaces
     
     def recognize(self, selectedFileName=None, selectedDirectoryName=None):
+        """
+            Find an image in the selectedDirectoryName that matches the selectedFileName image.
+            An eigenface value is calculated for each image in selectedDirectoryName. These values
+            are compared with the selectedFileName-image. The image with the minimum distance is
+            returned as match.
+        """
         # unknown face
         #selectedFileName = GALLERY_LOCATION + "/dennis/ZAS1_0039_norm_0006.jpg"
         #selectedFileName = GALLERY_LOCATION + "/norm/BARL/BARL_0009_norm_0000.jpg"
@@ -41,11 +57,11 @@ class PyFacesWrapper:
         self.controller.myapp.knownFacesDirectoryName = selectedDirectoryName
 
         # Threshold value
-        thresholdvalue = 2.0
+        #thresholdvalue = 2.0
         # Eigen faces
-        selectedEigenFaces = 6
+        #selectedEigenFaces = 6
         
-        self.controller.validateSelection(selectedFileName, selectedDirectoryName, selectedEigenFaces, thresholdvalue)
+        self.controller.validateSelection(selectedFileName, selectedDirectoryName, self.selectedEigenFaces, self.thresholdvalue)
         return self.controller.myapp # return an object with all result data
 
 if __name__ == "__main__":
