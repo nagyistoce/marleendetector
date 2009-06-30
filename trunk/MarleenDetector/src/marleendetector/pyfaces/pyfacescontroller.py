@@ -20,6 +20,11 @@ class PyFaceController(object):
         return extension
     
     def validateSelection(self, fileName, directoryName, numOfEigenfaces, thresholdVal):
+        """
+            1. validates the filename and the directory
+            2. validate the images in the directory
+            3. execute the algorithm
+        """
         print 'validateSel()::filename=', fileName, 'dir=:', directoryName, 'thresh=:', thresholdVal, 'numOfEigenfaces=:', numOfEigenfaces        
         
         if fileName is '':
@@ -32,9 +37,9 @@ class PyFaceController(object):
             self.updateResults(error)
         else:
             # filename and directory contents OK
-            extension = self.getExtension(fileName)            
-            dirParser = pyeigenfaces.DirectoryParser(directoryName)
-            imagefilenames = dirParser.parseDirectory(extension)
+            extension = self.getExtension(fileName) # get the extension of the selected image            
+            dirParser = pyeigenfaces.DirectoryParser(directoryName) # create a Directory Parser for the selected directory
+            imagefilenames = dirParser.parseDirectory(extension) # fetch image names that have the same extension as the selected image
             if(not self.facet.isValid(numOfEigenfaces, len(imagefilenames))):
                 numOfEigenfaces = len(imagefilenames) / 2
             #self.recogniseFace(imagefilenames,fileName,directoryName,numOfEigenfaces,thresholdVal)                                
@@ -47,6 +52,13 @@ class PyFaceController(object):
                 self.updateResults(inst, numOfEigenfaces)        
     
     def recogniseFace(self, imagefilenames, selectedFileName, selectedDirectory, numOfEigenfaces, thresholdVal):
+        """
+            Tries to recognize the image by calculating eigenfaces from the images in the directory
+            @param imagefilenames: list of image filenames
+            @param selectedFileName: the selected image
+            @param selectedDirectory: path of the selected directory
+            @param numOfEigenfaces: number of eigen faces
+        """
         print 'recogniseFace()::'
         self.facet.checkCache(selectedDirectory, imagefilenames, numOfEigenfaces)
         mindist, matchfile = self.facet.findMatchingImage(selectedFileName, numOfEigenfaces, thresholdVal)

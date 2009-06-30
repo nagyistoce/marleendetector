@@ -42,6 +42,14 @@ class NoMatchError(Exception):
  
 class FaceBundle:
     def __init__(self, imglist, wd, ht, adjfaces, fspace, avgvals, evals):
+        """
+            @param imglist: list of image filenames
+            @param wd: the width of all the images in the bundle
+            @param ht: the height of all the images in the bundle
+            @param adjfaces: matrix where each row represents a flat normalized image-array with the average pixelvalue substracted
+            @param avgvals: array with average values for each pixel location (avgvals.length = wd*ht)
+            @param evals: array of size image-list with sorted eigen values (max -> min)
+        """
         self.imglist = imglist
         self.wd = wd
         self.ht = ht
@@ -83,9 +91,9 @@ class egface:
         usub = self.bundle.eigenfaces[:selectedfacesnum, :]
         input_wk = dot(usub, inputface.transpose()).transpose()        
         dist = ((self.weights - input_wk) ** 2).sum(axis=1)
-        print dist
-        idx = argmin(dist)
-        print idx      
+        print dist # distance array
+        idx = argmin(dist) # returns minimum value in the array
+        print idx # the index in the array  
         mindist = sqrt(dist[idx])
         result = ''
         print "mindist:", mindist
@@ -98,6 +106,9 @@ class egface:
     def doCalculations(self, dir, imglist, selectednumeigenfaces):
         """
             Create bundle, calculate weights
+            @param dir: name of the directory
+            @param imglist: list of image filenames
+            @param selectedfacesnum: the number of eigen faces            
         """
         print "doCalculations()"        
         self.createFaceBundle(imglist);        
@@ -145,7 +156,9 @@ class egface:
             
     def createFaceBundle(self, imglist):
         """
-            Create a face bundle from the image list
+            Creates a face bundle from the image list
+            
+            @param imglist: list of image filenames
         """
         print "createFaceBundle()"        
         imgfilelist = self.validateDirectory(imglist) # list of XImage
@@ -155,20 +168,21 @@ class egface:
         imght = img._height
         numpixels = imgwdth * imght # number of pixels in each image
         numimgs = len(imgfilelist) # total number of images        
-        #trying to create a 2d array ,each row holds pixvalues of a single image
+        #trying to create a 2d array ,each row holds pixvalues (flat array representation of the image matrix) of a single image
         facemat = zeros((numimgs, numpixels)) # face matrix         
         for i in range(numimgs):
             pixarray = asfarray(imgfilelist[i]._pixellist) # get pixel array of image
-            pixarraymax = max(pixarray)
+            pixarraymax = max(pixarray) # max value in the flat image array
             pixarrayn = pixarray / pixarraymax # normalize array                 
-            facemat[i, :] = pixarrayn # add array to matrix          
+            facemat[i, :] = pixarrayn # set array to correct row in the matrix          
         
-        #create average values ,one for each column(ie pixel)        
-        avgvals = average(facemat, axis=0)        
+        #create average values, one for each column(ie pixel). 
+        # each value stands for the average of the pixel in all images, thus we have an array of lenght numpixels  
+        avgvals = average(facemat, axis=0)
         #make average faceimage in currentdir just for fun viewing..
         #imageops.make_image(avgvals,"average.png",(imgwdth,imght))               
         #substract avg val from each orig val to get adjusted faces(phi of T&P)     
-        adjfaces = facemat - avgvals               
+        adjfaces = facemat - avgvals
         adjfaces_tr = adjfaces.transpose()        
         L = dot(adjfaces , adjfaces_tr)
         evals1, evects1 = eigh(L)
@@ -176,7 +190,7 @@ class egface:
         #evects1,evals1,vt=svd(L,0)        
         reversedevalueorder = evals1.argsort()[::-1]
         evects = evects1[:, reversedevalueorder]               
-        evals = sort(evals1)[::-1]                
+        evals = sort(evals1)[::-1] # sort the eigen values
         #rows in u are eigenfaces        
         u = dot(adjfaces_tr, evects)
         u = u.transpose()               
@@ -197,8 +211,8 @@ class egface:
         newwt = zeros(self.weights.shape)
         eigenfaces = self.bundle.eigenfaces
         usub = eigenfaces[:selectedfacesnum, :]
-        evals = self.bundle.evals
-        evalssub = evals[:selectedfacesnum]        
+        evals = self.bundle.evals # sorted eigen values
+        evalssub = evals[:selectedfacesnum] # the first selectedfacesnum items
         for i in range(len(self.weights)):
             for j in range(len(evalssub)):        
                 newwt[i][j] = self.weights[i][j] * evalssub[j]        
@@ -224,6 +238,9 @@ class egface:
             imageops.make_image(imgdata, filename, (self.bundle.wd, self.bundle.ht), True)
     
     def createEigenimages(self, eigenspace):
+        """
+            Creates the eigenfaces, each row in the eigenspace matrix represents an image as flat-array
+        """
         egndir = '../eigenfaces'        
         try:
             if isdir(egndir):                
@@ -241,6 +258,10 @@ class egface:
             Check if the cache needs to be updated or created
             The Cache is updated when the number of images in the cache differs 
             from the number of images in the selected directory
+            
+            @param dir: name of the directory
+            @param imglist: list of image filenames
+            @param selectedfacesnum: the number of eigen faces
         """        
         cachefile = join(dir, "saveddata.cache")
         cache_changed = True
@@ -263,7 +284,10 @@ class egface:
                 self.doCalculations(dir, imglist, selectedfacesnum)
             f.close()
     
-    def isValid(self, selectedNumberOfEigenFaces, numberOfImageFiles):        
+    def isValid(self, selectedNumberOfEigenFaces, numberOfImageFiles):
+        """
+            Returns true if 0 < selectedNumberOfEigenFaces < numberOfImageFiles
+        """     
         if selectedNumberOfEigenFaces < numberOfImageFiles and selectedNumberOfEigenFaces > 0:
             return True
         else:
